@@ -2,6 +2,11 @@ using api.data;
 using Microsoft.AspNetCore.Mvc;
 using api.Models;
 using api.Mappers;
+using api.Dtos;
+using api.Dtos.Stock;
+using System.Linq;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace api.Controllers
 {
@@ -39,15 +44,12 @@ namespace api.Controllers
 
         // POST: api/stock
         [HttpPost]
-        public IActionResult CreateStock([FromBody] Stock stock)
+        public IActionResult CreateStock([FromBody] CreateStockRequestDto stockDto)
         {
-            if (stock == null)
-            {
-                return BadRequest();
-            }
+            var stock = stockDto.ToStockFromCreateDto();
             _context.Stocks.Add(stock);
             _context.SaveChanges();
-            return CreatedAtAction(nameof(GetStockById), new { id = stock.Id }, stock);
+            return CreatedAtAction(nameof(GetStockById), new { id = stock.Id }, stock.ToStockDto());
         }
 
 
@@ -55,7 +57,7 @@ namespace api.Controllers
         [HttpDelete("{id}")]
         public IActionResult DeleteStock(int id)
         {
-            var stock = _context.Stocks.Find(id);
+            var stock = _context.Stocks.FirstOrDefault(s => s.Id == id);
             if (stock == null)
             {
                 return NotFound();
@@ -63,6 +65,28 @@ namespace api.Controllers
             _context.Stocks.Remove(stock);
             _context.SaveChanges();
             return NoContent();
+        }
+
+        // PUT: api/stock/{id}
+        [HttpPut("{id}")]
+        public IActionResult UpdateStock([FromRoute] int id, [FromBody] UpdateStockRequestDto stockDto)
+        {
+            var stockModel = _context.Stocks.FirstOrDefault(s => s.Id == id);
+            if (stockModel == null)
+            {
+                return NotFound();
+            }
+            stockModel.Symbol = stockDto.Symbol;
+            stockModel.CompanyName = stockDto.CompanyName;
+            stockModel.Purchase = stockDto.Purchase;
+            stockModel.Divident = stockDto.Divident;
+            stockModel.LastDiv = stockDto.LastDiv;
+            stockModel.Industry = stockDto.Industry;
+            stockModel.MarketCap = stockDto.MarketCap;
+
+            _context.Stocks.Update(stockModel);
+            _context.SaveChanges();
+            return Ok(stockModel.ToStockDto());
         }
     }
 
