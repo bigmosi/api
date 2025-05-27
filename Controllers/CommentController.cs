@@ -27,6 +27,11 @@ namespace api.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAllComments()
         {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
             var comments = await _commentRepository.GetAllAsync();
             var commentDtos = comments.Select(c => c.ToCommentDto());
             return Ok(commentDtos);
@@ -35,6 +40,10 @@ namespace api.Controllers
         [HttpGet("{id:int}")]
         public async Task<IActionResult> GetCommentById(int id)
         {
+             if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
             var comment = await _commentRepository.GetByIdAsync(id);
             if (comment == null)
             {
@@ -47,6 +56,10 @@ namespace api.Controllers
         [HttpPost("{stockId:int}")]
         public async Task<IActionResult> Create([FromRoute] int stockId, CreateCommentDto commentDto)
         {
+             if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
             if (!await _stockRepo.StockExists(stockId))
             {
                 return BadRequest("Stock not found");
@@ -61,6 +74,10 @@ namespace api.Controllers
         [HttpPut("{id:int}")]
         public async Task<IActionResult> Update([FromRoute] int id, [FromBody] UpdateCommentRequestDto commentDto)
         {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
             var comment = await _commentRepository.UpdateAsync(id, commentDto.ToCommentFromUpdate());
             if (comment == null)
             {
@@ -75,6 +92,10 @@ namespace api.Controllers
 
         public async Task<IActionResult> Delete([FromRoute] int id)
         {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
             var comment = await _commentRepository.DeleteAsync(id);
             if (comment == null)
             {

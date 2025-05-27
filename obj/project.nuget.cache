@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "D9Qk+deqX2A=",
+  "dgSpecHash": "QKZxqaofBCA=",
   "success": true,
-  "projectFilePath": "C:\\Users\\HP PAVILION\\Desktop\\.NET\\api\\api\\api.csproj",
+  "projectFilePath": "C:\\Users\\HP PAVILION\\Desktop\\.NET\\stock_api\\api.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\HP PAVILION\\.nuget\\packages\\azure.core\\1.38.0\\azure.core.1.38.0.nupkg.sha512",
     "C:\\Users\\HP PAVILION\\.nuget\\packages\\azure.identity\\1.11.4\\azure.identity.1.11.4.nupkg.sha512",
