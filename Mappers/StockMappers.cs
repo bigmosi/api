@@ -1,6 +1,7 @@
 using api.Models;
 using api.Dtos.Stock;
 using api.Dtos;
+using api.Dtos.Comment;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -19,7 +20,9 @@ namespace api.Mappers
                 Divident = stockModel.Divident,
                 LastDiv = stockModel.LastDiv,
                 Industry = stockModel.Industry,
-                MarketCap = stockModel.MarketCap
+                MarketCap = stockModel.MarketCap,
+                Comments = stockModel.Comments.Select(c => c.ToCommentDto()).ToList()
+
             };
         }
 
@@ -47,7 +50,7 @@ namespace api.Mappers
                 Divident = stockDto.Divident,
                 LastDiv = stockDto.LastDiv,
                 Industry = stockDto.Industry,
-                MarketCap = stockDto.MarketCap
+                MarketCap = stockDto.MarketCap,
             };
         }
     }
