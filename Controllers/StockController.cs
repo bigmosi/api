@@ -1,7 +1,9 @@
 using api.Dtos;
 using api.Dtos.Stock;
 using api.Interfaces;
+using api.Models;
 using Microsoft.AspNetCore.Mvc;
+using stock_api.Helpers;
 
 namespace api.Controllers
 {
@@ -18,13 +20,12 @@ namespace api.Controllers
 
         // GET: api/stock
         [HttpGet]
-        public async Task<IActionResult> GetAll()
+        public async Task<IActionResult> GetAll([FromQuery] QueryObject query)
         {
             if (!ModelState.IsValid)
-            {
                 return BadRequest(ModelState);
-            }
-            var stocks = await _stockRepo.GetAllAsync();
+
+            var stocks = await _stockRepo.GetAllAsync(query);
             return Ok(stocks);
         }
 
@@ -33,14 +34,11 @@ namespace api.Controllers
         public async Task<IActionResult> GetStockById([FromRoute] int id)
         {
             if (!ModelState.IsValid)
-            {
                 return BadRequest(ModelState);
-            }
+
             var stock = await _stockRepo.GetByIdAsync(id);
             if (stock == null)
-            {
                 return NotFound();
-            }
 
             return Ok(stock);
         }
@@ -50,10 +48,19 @@ namespace api.Controllers
         public async Task<IActionResult> CreateStock([FromBody] CreateStockRequestDto stockDto)
         {
             if (!ModelState.IsValid)
-            {
                 return BadRequest(ModelState);
-            }
-            var createdStock = await _stockRepo.CreateAsync(stockDto);
+
+            var stock = new Stock
+            {
+                Symbol = stockDto.Symbol,
+                CompanyName = stockDto.CompanyName,
+                Purchase = stockDto.Purchase,
+                LastDiv = stockDto.LastDiv,
+                Industry = stockDto.Industry,
+                MarketCap = stockDto.MarketCap
+            };
+
+            var createdStock = await _stockRepo.CreateAsync(stock);
             return CreatedAtAction(nameof(GetStockById), new { id = createdStock.Id }, createdStock);
         }
 
@@ -61,16 +68,26 @@ namespace api.Controllers
         [HttpPut("{id:int}")]
         public async Task<IActionResult> UpdateStock([FromRoute] int id, [FromBody] UpdateStockRequestDto stockDto)
         {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
             if (id <= 0)
                 return BadRequest("Invalid stock ID.");
 
-            stockDto.Id = id; // Set ID since it might not be in body
-
-            var updatedStock = await _stockRepo.UpdateAsync(stockDto);
-            if (updatedStock == null)
+            var stock = new Stock
             {
+                Id = id,
+                Symbol = stockDto.Symbol,
+                CompanyName = stockDto.CompanyName,
+                Purchase = stockDto.Purchase,
+                LastDiv = stockDto.LastDiv,
+                Industry = stockDto.Industry,
+                MarketCap = stockDto.MarketCap
+            };
+
+            var updatedStock = await _stockRepo.UpdateAsync(stock);
+            if (updatedStock == null)
                 return NotFound();
-            }
 
             return Ok(updatedStock);
         }
@@ -79,15 +96,12 @@ namespace api.Controllers
         [HttpDelete("{id:int}")]
         public async Task<IActionResult> DeleteStock([FromRoute] int id)
         {
-             if (!ModelState.IsValid)
-            {
+            if (!ModelState.IsValid)
                 return BadRequest(ModelState);
-            }
+
             var deletedStock = await _stockRepo.DeleteAsync(id);
             if (deletedStock == null)
-            {
                 return NotFound();
-            }
 
             return NoContent();
         }
